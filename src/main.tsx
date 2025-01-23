@@ -8,7 +8,7 @@ import { loginStat, logon } from "./lib/api";
 import { Home } from "./page/home";
 
 if (logon) {
-    //await loginStat()
+    loginStat()
 }
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(

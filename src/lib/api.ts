@@ -4,15 +4,15 @@ import * as log from "./logger"
 
 const API_HOST = "https://api.zline.d2lib.com"
 
-let cookie: string = "";
+let cookie: string = localStorage.getItem('cookie') || 'PZLSystemLogin=';
 let xToken: string
 export let logon: boolean = localStorage.getItem('logon') === 'true'
 
 async function get(url: string, params: string = "") {
-    const response: any = await fetch(`${API_HOST}${url}?${params}&cookie=${encodeURIComponent(cookie)}`, {method: 'GET'})
+    const response: any = await fetch(`${API_HOST}${url}?cookie=${encodeURIComponent(cookie)}&${params}`, {method: 'GET'})
     .then(res => res.json())
     .catch((error) => {
-        log.error(error, `failed to post ${url}  reason: ${error}`)
+        log.error(error, `failed to get ${url}  reason: ${error}`)
     })
 
     return response
@@ -47,8 +47,8 @@ export async function login(account: string, password: string) {
     } else {
         log.error(Error(res.message))
         if (logon) {
-            cookie = ""
-            localStorage.setItem('cookie', "")
+            cookie = "PZLSystemLogin="
+            localStorage.setItem('cookie', "PZLSystemLogin=")
             localStorage.setItem('logon', 'false')
             logon = false
         }
@@ -57,33 +57,24 @@ export async function login(account: string, password: string) {
 
 export async function logout() {
     await get('/security/logout')
+    cookie = "PZLSystemLogin="
+    localStorage.setItem('cookie', "PZLSystemLogin=")
     localStorage.setItem('logon', 'false')
     logon = false
 }
 
 export async function loginStat() {
-    await fetch('https://www.jincai.sh.cn/zlinesystem/hdesk', {
-        method: 'GET',
-        headers: {
-            "Referer": "https://www.jincai.sh.cn/",
-            "credential": "include",
-            "Cookie": cookie,
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
-        }
-    }).then(async res => {
-        console.log(res.url)
-        if (res.url=='https://www.jincai.sh.cn/zlinesystem/xlogin') {
-            log.info("cookie expired")
-            await logout()
-            location.reload()
-        } else {
-            log.info("login check passed")
-        }
-    }).catch(async (error) => {
-        log.error(error, `failed to check login status: ${error}`)
-        await logout()
+    const res = await get('/security/status')
+    if (res.data.valid) {
+        log.info("login check passed")
+    } else {
+        log.info("cookie expired")
+        cookie = "PZLSystemLogin="
+        localStorage.setItem('cookie', "PZLSystemLogin=")
+        localStorage.setItem('logon', 'false')
+        logon = false
         location.reload()
-    })
+    }
 }
 
 export async function quickLink() {
