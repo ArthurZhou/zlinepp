@@ -10,17 +10,17 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { logout } from "@/lib/api"
+import { logout, quickLink } from "@/lib/api"
 import { LucideLogOut, LucideSearch } from "lucide-react"
 import { msg } from "./message"
 
 
 export function AppSidebar() {
 	return (
-		<Sidebar style={{ transition: "0.2s ease" }}><SidebarContent><SidebarGroup>
+		<Sidebar><SidebarContent><SidebarGroup>
 			<SidebarHeader><h1>zline++</h1></SidebarHeader>
 			<SidebarGroupContent><SidebarMenu>
-				<SidebarMenuItem key={"ExamScore"}><SidebarMenuButton onPointerDown={() => { }}>
+				<SidebarMenuItem key={"ExamScore"}><SidebarMenuButton onPointerDown={() => { quickLink() }}>
 					<LucideSearch /><span>成绩查询</span></SidebarMenuButton>
 				</SidebarMenuItem>
 				<SidebarMenuItem key={"Logout"}>
